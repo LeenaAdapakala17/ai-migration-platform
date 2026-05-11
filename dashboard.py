@@ -6,7 +6,8 @@ import plotly.graph_objects as go
 import plotly.express as px
 
 # Add src to path
-sys.path.insert(0, 'src')
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 from ai_models.application_analyzer import ApplicationAnalyzer
 
