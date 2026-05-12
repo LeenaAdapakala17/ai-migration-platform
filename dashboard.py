@@ -477,3 +477,24 @@ elif page == "📊 Application Analysis":
             with col2:
                 st.markdown("**🤖 AI-Optimized Migration:**")
                 st.write(f"• Timeline: {result['ai_weeks']:.0f} weeks")
+
+# Quick Portfolio Fix - Add this at the end
+if page == "📈 Portfolio Dashboard" and len(st.session_state.analysis_results) == 0:
+    if st.button("🚀 Generate Demo Portfolio"):
+        # Quick demo data
+        demo_results = [
+            {"app_name": "Banking System", "traditional_weeks": 200, "ai_weeks": 45, "cost_savings": 12000000},
+            {"app_name": "Payment API", "traditional_weeks": 25, "ai_weeks": 6, "cost_savings": 150000},
+            {"app_name": "Web Portal", "traditional_weeks": 60, "ai_weeks": 14, "cost_savings": 890000}
+        ]
+        
+        for demo in demo_results:
+            st.session_state.analysis_results.append({
+                'app_name': demo['app_name'],
+                'traditional_weeks': demo['traditional_weeks'],
+                'ai_weeks': demo['ai_weeks'],
+                'cost_savings': demo['cost_savings'],
+                'complexity': 3,
+                'approach': 'AI-Optimized'
+            })
+        st.rerun()
