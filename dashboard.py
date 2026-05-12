@@ -103,19 +103,7 @@ st.markdown("""
         transition: all 0.2s ease;
     }
     
-    .stButton > button:hover {
-        transform: translateY(-1px);
-    }
-    
     /* Analysis results styling */
-    .analysis-result {
-        background: #f8f9fa;
-        padding: 1.5rem;
-        border-radius: 12px;
-        border: 1px solid #dee2e6;
-        margin: 1rem 0;
-    }
-    
     .success-box {
         background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
         color: #155724;
@@ -123,6 +111,7 @@ st.markdown("""
         border-radius: 8px;
         border-left: 4px solid #28a745;
         margin: 1rem 0;
+        font-weight: 600;
     }
     
     /* Mobile table styling */
@@ -157,10 +146,6 @@ st.markdown("""
             padding: 1rem;
         }
         
-        .metric-value {
-            font-size: 1.8rem;
-        }
-        
         .block-container {
             padding: 1rem 0.5rem;
         }
@@ -175,26 +160,6 @@ st.markdown("""
             padding: 0.75rem;
             margin-bottom: 0.75rem;
         }
-        
-        .metric-value {
-            font-size: 1.5rem;
-        }
-    }
-    
-    /* Loading animation */
-    .loading-spinner {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #1f77b4;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -213,23 +178,20 @@ if 'analyzer' not in st.session_state:
 if 'analysis_results' not in st.session_state:
     st.session_state.analysis_results = []
 
-# Mobile detection
-def is_mobile():
-    return st.sidebar.checkbox("📱 Mobile Mode", False, help="Optimized layout for mobile devices")
-
-mobile_mode = is_mobile()
-
-# Navigation
+# Navigation with mobile detection
 st.sidebar.header("🚀 Navigation")
 st.sidebar.markdown("*Select a feature to explore AI-powered migration capabilities*")
 
+# Mobile mode toggle
+mobile_mode = st.sidebar.checkbox("📱 Mobile Mode", False, help="Optimized layout for mobile devices")
+
 page = st.sidebar.selectbox(
     "Choose Feature:",
-    ["🏠 Overview", "📊 Application Analysis", "📈 Portfolio Dashboard", "💰 Cost Calculator"],
+    ["🏠 Overview", "📊 Application Analysis", "📈 Portfolio Dashboard"],
     key="main_navigation"
 )
 
-# Helper functions for mobile optimization
+# Helper functions
 def display_mobile_metric(label, value, delta, icon="📊"):
     st.markdown(f"""
     <div class="metric-card">
@@ -247,8 +209,6 @@ def display_desktop_metrics(metrics_data):
 
 def simulate_analysis(app_name):
     """Simulate AI analysis with realistic results"""
-    
-    # Smart classification based on app name
     name_lower = app_name.lower()
     
     if any(word in name_lower for word in ['bank', 'financial', 'payment', 'trading']):
@@ -273,14 +233,13 @@ def simulate_analysis(app_name):
         traditional_weeks = random.randint(60, 120)
     
     # AI optimization calculations
-    ai_reduction_factor = random.uniform(0.20, 0.35)  # 65-80% reduction
+    ai_reduction_factor = random.uniform(0.20, 0.35)
     ai_weeks = traditional_weeks * ai_reduction_factor
     
-    # Team calculations
+    # Team and cost calculations
     traditional_team = max(4, int(traditional_weeks / 8))
     ai_team = max(2, int(ai_weeks / 8))
     
-    # Cost calculations
     traditional_cost = (traditional_team * traditional_weeks * 2500) + (traditional_weeks * 400)
     ai_cost = (ai_team * ai_weeks * 2800) + (ai_weeks * 300) + 20000
     
@@ -333,9 +292,7 @@ if page == "🏠 Overview":
         display_desktop_metrics(metrics_data)
     
     # Features section
-    col1, col2 = st.columns(2)
-    
-    with col1:
+    if mobile_mode:
         st.subheader("🤖 AI-Powered Features")
         st.markdown("""
         - **Smart Application Analysis**: Automatic complexity assessment
@@ -344,8 +301,7 @@ if page == "🏠 Overview":
         - **Risk Assessment**: AI-identified challenges and solutions
         - **Resource Optimization**: Intelligent sizing and scaling
         """)
-    
-    with col2:
+        
         st.subheader("📊 Business Benefits")
         st.markdown("""
         - **75% faster** migration timelines
@@ -354,6 +310,28 @@ if page == "🏠 Overview":
         - **Data-driven decisions** replacing guesswork
         - **Predictable outcomes** with quantified ROI
         """)
+    else:
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.subheader("🤖 AI-Powered Features")
+            st.markdown("""
+            - **Smart Application Analysis**: Automatic complexity assessment
+            - **Predictive Planning**: ML-based effort and cost estimation  
+            - **Portfolio Optimization**: Multi-application analysis
+            - **Risk Assessment**: AI-identified challenges and solutions
+            - **Resource Optimization**: Intelligent sizing and scaling
+            """)
+        
+        with col2:
+            st.subheader("📊 Business Benefits")
+            st.markdown("""
+            - **75% faster** migration timelines
+            - **93% cost reduction** through optimization
+            - **Smaller teams** with higher productivity
+            - **Data-driven decisions** replacing guesswork
+            - **Predictable outcomes** with quantified ROI
+            """)
     
     # Sample results
     st.subheader("🏆 Demonstrated Results")
@@ -382,24 +360,34 @@ elif page == "📊 Application Analysis":
     st.header("📊 AI Application Analysis")
     st.markdown("*Get instant AI-powered migration analysis for any enterprise application*")
     
-    # Input section
-    col1, col2 = st.columns([3, 1] if not mobile_mode else [1])
-    
-    with col1:
+    # FIXED: Input section with proper mobile handling
+    if mobile_mode:
+        # Single column layout for mobile
         app_name = st.text_input(
             "Enter Application Name:",
             placeholder="e.g., Banking Core System, Payment API, Customer Portal",
-            key="application_input",
+            key="application_input_mobile",
             help="Enter any application name to get AI analysis"
         )
-    
-    if not mobile_mode:
+        
+        analyze_btn = st.button("🔍 Analyze Application", type="primary", key="analyze_button_mobile")
+        
+    else:
+        # Two column layout for desktop
+        col1, col2 = st.columns([3, 1])
+        
+        with col1:
+            app_name = st.text_input(
+                "Enter Application Name:",
+                placeholder="e.g., Banking Core System, Payment API, Customer Portal",
+                key="application_input_desktop",
+                help="Enter any application name to get AI analysis"
+            )
+        
         with col2:
             st.write("") # Spacing
             st.write("") # Spacing
-            analyze_btn = st.button("🔍 Analyze Application", type="primary", key="analyze_button")
-    else:
-        analyze_btn = st.button("🔍 Analyze Application", type="primary", key="analyze_button_mobile")
+            analyze_btn = st.button("🔍 Analyze Application", type="primary", key="analyze_button_desktop")
     
     # Sample applications
     st.markdown("**💡 Try these sample applications:**")
@@ -410,15 +398,23 @@ elif page == "📊 Application Analysis":
         "Insurance Claims System", "Healthcare Management Portal"
     ]
     
-    # Create clickable sample buttons
-    cols = st.columns(2 if mobile_mode else 3)
-    for i, sample_app in enumerate(sample_apps):
-        with cols[i % (2 if mobile_mode else 3)]:
-            if st.button(f"📱 {sample_app.split()[0]} {sample_app.split()[1]}", key=f"sample_{i}"):
+    # Create sample buttons with proper mobile layout
+    if mobile_mode:
+        # Single column for mobile
+        for i, sample_app in enumerate(sample_apps):
+            if st.button(f"📱 {sample_app}", key=f"mobile_sample_{i}"):
                 app_name = sample_app
                 analyze_btn = True
+    else:
+        # Multiple columns for desktop
+        cols = st.columns(2)
+        for i, sample_app in enumerate(sample_apps):
+            with cols[i % 2]:
+                if st.button(f"📋 {sample_app}", key=f"desktop_sample_{i}"):
+                    app_name = sample_app
+                    analyze_btn = True
     
-    # Analysis
+    # Analysis execution
     if analyze_btn and app_name:
         with st.spinner("🤖 AI analyzing application... This may take a few moments"):
             # Simulate processing time
@@ -454,79 +450,30 @@ elif page == "📊 Application Analysis":
         # Detailed comparison
         st.subheader("📈 Migration Comparison")
         
-        col1, col2 = st.columns(2)
-        
-        with col1:
+        if mobile_mode:
+            # Single column for mobile
             st.markdown("**📊 Traditional Migration:**")
             st.write(f"• Timeline: {result['traditional_weeks']:.0f} weeks")
             st.write(f"• Team Size: {result['traditional_team']} developers")
             st.write(f"• Total Cost: ${result['traditional_cost']:,}")
             st.write(f"• Risk Level: High")
-        
-        with col2:
+            
             st.markdown("**🤖 AI-Optimized Migration:**")
             st.write(f"• Timeline: {result['ai_weeks']:.0f} weeks")
             st.write(f"• Team Size: {result['ai_team']} developers") 
             st.write(f"• Total Cost: ${result['ai_cost']:,}")
             st.write(f"• Risk Level: Low")
-        
-        # Recommendations
-        st.subheader("🎯 AI Recommendations")
-        
-        st.info(f"**Recommended Strategy:** {result['approach']}")
-        
-        recommendations = [
-            f"Assemble team of {result['ai_team']} experienced developers",
-            f"Allocate budget of ${result['ai_cost']:,} for {result['ai_weeks']:.0f} weeks",
-            f"Implement {result['approach'].lower()} methodology",
-            "Set up AI-powered CI/CD pipeline for automation",
-            "Use predictive monitoring and intelligent scaling",
-            "Plan phased rollout with automated rollback capabilities"
-        ]
-        
-        for i, rec in enumerate(recommendations, 1):
-            st.write(f"{i}. {rec}")
-
-elif page == "📈 Portfolio Dashboard":
-    st.header("📈 Portfolio Migration Dashboard")
-    st.markdown("*Comprehensive analysis of multiple applications for enterprise-scale planning*")
-    
-    if len(st.session_state.analysis_results) == 0:
-        st.info("💡 Analyze some applications first or generate a sample portfolio to see dashboard")
-        
-        if st.button("🚀 Generate Sample Portfolio Analysis", type="primary", key="generate_portfolio"):
-            sample_portfolio = [
-                "Legacy Banking Core System", "Payment Processing API", 
-                "Customer Portal Web Application", "Trading Platform Middleware",
-                "Mobile Banking Service", "Data Analytics Platform"
-            ]
+        else:
+            # Two columns for desktop
+            col1, col2 = st.columns(2)
             
-            with st.spinner("🤖 Analyzing enterprise portfolio..."):
-                progress_bar = st.progress(0)
-                
-                for i, app in enumerate(sample_portfolio):
-                    result = simulate_analysis(app)
-                    st.session_state.analysis_results.append(result)
-                    progress_bar.progress((i + 1) / len(sample_portfolio))
-                    time.sleep(0.3)
+            with col1:
+                st.markdown("**📊 Traditional Migration:**")
+                st.write(f"• Timeline: {result['traditional_weeks']:.0f} weeks")
+                st.write(f"• Team Size: {result['traditional_team']} developers")
+                st.write(f"• Total Cost: ${result['traditional_cost']:,}")
+                st.write(f"• Risk Level: High")
             
-            st.success("✅ Portfolio analysis complete!")
-            st.experimental_rerun()
-    
-    if len(st.session_state.analysis_results) > 0:
-        results = st.session_state.analysis_results
-        
-        # Portfolio summary calculations
-        total_apps = len(results)
-        total_traditional_weeks = sum(r['traditional_weeks'] for r in results)
-        total_ai_weeks = sum(r['ai_weeks'] for r in results)
-        total_time_saved = total_traditional_weeks - total_ai_weeks
-        total_traditional_cost = sum(r['traditional_cost'] for r in results)
-        total_ai_cost = sum(r['ai_cost'] for r in results)
-        total_cost_saved = total_traditional_cost - total_ai_cost
-        
-        avg_complexity = sum(r['complexity'] for r in results) / total_apps
-        time_reduction_pct = (total_time_saved / total_traditional_weeks) * 100
-        cost_reduction_pct = (total_cost_saved / total_traditional_cost) * 100
-        
-        # Portfolio metrics
+            with col2:
+                st.markdown("**🤖 AI-Optimized Migration:**")
+                st.write(f"• Timeline: {result['ai_weeks']:.0f} weeks")
