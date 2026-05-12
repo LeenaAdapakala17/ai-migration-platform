@@ -166,7 +166,7 @@ st.markdown("""
 
 # Header
 st.markdown('<h1 class="main-header">🤖 AI-Powered Azure Migration Platform</h1>', unsafe_allow_html=True)
-st.markdown('<div class="creator-info">Created by <strong>Leena Adapakala</strong> | Senior DevOps & Azure Platform Engineer<br>🚀 AI-Driven Cloud Migration Solutions</div>', unsafe_allow_html=True)
+st.markdown('<div class="creator-info">Created by <strong>Leena Adapakala</strong> | 🚀 AI-Driven Cloud Migration Solutions</div>', unsafe_allow_html=True)
 
 # Initialize session state
 if 'analyzer' not in st.session_state:
