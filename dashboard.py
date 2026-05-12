@@ -498,3 +498,146 @@ if page == "📈 Portfolio Dashboard" and len(st.session_state.analysis_results)
                 'approach': 'AI-Optimized'
             })
         st.rerun()
+
+elif page == "📈 Portfolio Dashboard":
+    st.header("📈 Portfolio Migration Dashboard")
+    st.markdown("*Comprehensive analysis of multiple applications for enterprise-scale planning*")
+    
+    if len(st.session_state.analysis_results) == 0:
+        st.info("💡 Analyze some applications first or generate a sample portfolio to see dashboard")
+        
+        if st.button("🚀 Generate Sample Portfolio Analysis", type="primary", key="generate_portfolio"):
+            sample_portfolio = [
+                "Legacy Banking Core System", "Payment Processing API", 
+                "Customer Portal Web Application", "Trading Platform Middleware",
+                "Mobile Banking Service", "Data Analytics Platform"
+            ]
+            
+            with st.spinner("🤖 Analyzing enterprise portfolio..."):
+                progress_bar = st.progress(0)
+                
+                for i, app in enumerate(sample_portfolio):
+                    result = simulate_analysis(app)
+                    st.session_state.analysis_results.append(result)
+                    progress_bar.progress((i + 1) / len(sample_portfolio))
+                    time.sleep(0.3)
+            
+            st.success("✅ Portfolio analysis complete!")
+            st.rerun()  # Changed from st.experimental_rerun()
+    
+    if len(st.session_state.analysis_results) > 0:
+        results = st.session_state.analysis_results
+        
+        # Portfolio summary calculations
+        total_apps = len(results)
+        total_traditional_weeks = sum(r['traditional_weeks'] for r in results)
+        total_ai_weeks = sum(r['ai_weeks'] for r in results)
+        total_time_saved = total_traditional_weeks - total_ai_weeks
+        total_traditional_cost = sum(r['traditional_cost'] for r in results)
+        total_ai_cost = sum(r['ai_cost'] for r in results)
+        total_cost_saved = total_traditional_cost - total_ai_cost
+        
+        avg_complexity = sum(r['complexity'] for r in results) / total_apps
+        time_reduction_pct = (total_time_saved / total_traditional_weeks) * 100
+        cost_reduction_pct = (total_cost_saved / total_traditional_cost) * 100
+        
+        # Portfolio metrics
+        st.subheader("🏆 Portfolio Summary")
+        
+        metrics_data = [
+            ("Applications Analyzed", f"{total_apps}", "Enterprise Portfolio", "📊"),
+            ("Total Time Saved", f"{total_time_saved:.0f} weeks", f"{time_reduction_pct:.1f}% reduction", "⏱️"),
+            ("Total Cost Savings", f"${total_cost_saved:,.0f}", f"{cost_reduction_pct:.1f}% reduction", "💰"),
+            ("Average Complexity", f"{avg_complexity:.1f}/5", "Portfolio Risk Level", "🎯")
+        ]
+        
+        if mobile_mode:
+            for label, value, delta, icon in metrics_data:
+                display_mobile_metric(label, value, delta, icon)
+        else:
+            display_desktop_metrics(metrics_data)
+        
+        # Detailed results
+        st.subheader("📊 Application Portfolio Analysis")
+        
+        # Create results dataframe
+        portfolio_df = pd.DataFrame([{
+            'Application': r['app_name'],
+            'Type': r['app_type'].title(),
+            'Complexity': f"{r['complexity']}/5",
+            'Traditional (weeks)': f"{r['traditional_weeks']:.0f}",
+            'AI-Optimized (weeks)': f"{r['ai_weeks']:.0f}",
+            'Time Savings': f"{r['time_savings_pct']:.0f}%",
+            'Cost Savings': f"${r['cost_savings']:,.0f}",
+            'Migration Approach': r['approach']
+        } for r in results])
+        
+        if mobile_mode:
+            # Mobile-friendly card layout
+            for _, row in portfolio_df.iterrows():
+                st.markdown(f"""
+                <div class="mobile-card">
+                    <h4>📱 {row['Application']}</h4>
+                    <p><strong>Type:</strong> {row['Type']} | <strong>Complexity:</strong> {row['Complexity']}</p>
+                    <p><strong>Traditional:</strong> {row['Traditional (weeks)']} weeks → <strong>AI:</strong> {row['AI-Optimized (weeks)']} weeks</p>
+                    <p><strong>Savings:</strong> {row['Time Savings']} time, {row['Cost Savings']} cost</p>
+                    <p><strong>Strategy:</strong> {row['Migration Approach']}</p>
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            # Desktop table view
+            st.dataframe(portfolio_df, use_container_width=True)
+        
+        # Executive summary
+        st.subheader("📋 Executive Summary")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**📊 Portfolio Metrics:**")
+            st.write(f"• **{total_apps} applications** analyzed using AI")
+            st.write(f"• **Traditional approach**: {total_traditional_weeks:.0f} weeks ({total_traditional_weeks/52:.1f} years)")
+            st.write(f"• **AI-optimized approach**: {total_ai_weeks:.0f} weeks ({total_ai_weeks/52:.1f} years)")
+            st.write(f"• **Time savings**: {total_time_saved:.0f} weeks ({time_reduction_pct:.1f}% reduction)")
+        
+        with col2:
+            st.markdown("**💰 Financial Impact:**")
+            st.write(f"• **Traditional cost**: ${total_traditional_cost:,.0f}")
+            st.write(f"• **AI-optimized cost**: ${total_ai_cost:,.0f}")
+            st.write(f"• **Total savings**: ${total_cost_saved:,.0f}")
+            st.write(f"• **ROI**: {(total_cost_saved/50000):.0f}x (assuming $50K AI investment)")
+        
+        # Business impact
+        st.subheader("🎯 Business Impact Statement")
+        st.info(f"""
+        **Portfolio Transformation Results:**
+        
+        This AI-powered analysis demonstrates transformational impact for enterprise cloud migration:
+        
+        • **Speed**: {time_reduction_pct:.0f}% faster delivery enables {(total_traditional_weeks - total_ai_weeks)/52:.1f} years faster time-to-market
+        • **Cost**: ${total_cost_saved:,.0f} savings can fund {total_cost_saved/100000:.0f} additional strategic initiatives  
+        • **Efficiency**: Reduced team requirements from {sum(r['traditional_team'] for r in results)} to {sum(r['ai_team'] for r in results)} developers
+        • **Risk**: AI-guided approach reduces project failure probability from 70% to <10%
+        • **Innovation**: Demonstrates enterprise AI readiness and digital transformation capability
+        """)
+        
+        # Clear results option
+        if st.button("🔄 Clear Portfolio & Start New Analysis", key="clear_portfolio"):
+            st.session_state.analysis_results = []
+            st.rerun()
+
+# Add footer
+st.markdown("---")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown("**🤖 AI Migration Platform**")
+    st.markdown("*Revolutionizing Cloud Migration*")
+
+with col2:
+    st.markdown("**👩‍💻 Created by Leena Adapakala**")
+    st.markdown("*🚀 AI-Driven Cloud Migration Solutions*")
+
+with col3:
+    st.markdown("**🔗 Links**")
+    st.markdown("[GitHub](https://github.com/LeenaAdapakala17/ai-migration-platform) | [LinkedIn](https://linkedin.com/in/leena-adapakala)")
